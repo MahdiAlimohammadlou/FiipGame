@@ -28,13 +28,6 @@ class Player(AbstractBaseModel):
         player_business = PlayerBusiness.objects.get(player=self, business_id=business_id)
         return player_business.upgrade()
 
-    def update_profit(self):
-        businesses = PlayerBusiness.objects.filter(player=self)
-        total_profit = sum(business.current_profit() for business in businesses)
-        self.profit += total_profit
-        self.save()
-        return total_profit
-
 class Business(AbstractBaseModel):
     CATEGORY_CHOICES = [
         ('shop', 'Shop'),
