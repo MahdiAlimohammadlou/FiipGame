@@ -1,5 +1,6 @@
 from django.db import models
 from core.models import AbstractBaseModel
+from django.utils import timezone
 
 # Create your models here.
 class Player(AbstractBaseModel):
@@ -9,6 +10,7 @@ class Player(AbstractBaseModel):
     coin = models.IntegerField(default=0)
     level = models.IntegerField(default=1)
     referral_code = models.CharField(max_length=20, unique=True, blank=True, null=True)
+    last_coin_update = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.name

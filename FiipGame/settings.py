@@ -152,9 +152,10 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Tehran'
 
 #Celery beat Schedule
+from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'update-coins-every-hour': {
         'task': 'account.tasks.update_player_coins',
-        'schedule': 5.0,
+        'schedule': crontab(minute=0, hour='*'),
     },
 }
