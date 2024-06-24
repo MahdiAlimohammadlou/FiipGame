@@ -30,12 +30,12 @@ class Player(AbstractBaseModel):
 
 class Business(AbstractBaseModel):
     CATEGORY_CHOICES = [
-        ('shop', 'Shop'),
-        ('company', 'Company'),
-        ('manufacturing', 'Manufacturinfg'),
-        ('import', 'Import'),
-        ('mine', 'Mine'),
-        ('factory', 'Factory'),
+        ('مغازه', 'مغازه'),
+        ('شرکت', 'شرکت'),
+        ('تولیدی', 'تولیدی'),
+        ('واردات', 'واردات'),
+        ('معدن', 'معدن'),
+        ('کارخانه', 'کارخانه'),
     ]
 
     RANKING_CHOICES = [
