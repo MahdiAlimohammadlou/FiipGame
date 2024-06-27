@@ -1,7 +1,8 @@
 from django.urls import path
-from .views import top_players, player_by_device_id
+from .views import top_players, RetrievePlayerView, CreatePlayerView
 
 urlpatterns = [
     path('top-players/', top_players, name='top-players'),
-    path('player/<str:device_id>/', player_by_device_id, name='player-by-device-id'),
+    path('player/<str:device_id>/', RetrievePlayerView.as_view(), name='retrieve-player'),
+    path('player/', CreatePlayerView.as_view(), name='create-player'),
 ]

@@ -1,7 +1,7 @@
 # views.py
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics
 from .models import Player
 from .serializers import PlayerSerializer
 
@@ -23,13 +23,11 @@ def top_players(request):
     except Exception as e:
         return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@api_view(['GET'])
-def player_by_device_id(request, device_id):
-    try:
-        player = Player.objects.get(device_id=device_id)
-        serializer = PlayerSerializer(player)
-        return Response(serializer.data)
-    except Player.DoesNotExist:
-        return Response({'detail': 'Player not found'}, status=status.HTTP_404_NOT_FOUND)
-    except Exception as e:
-        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+class CreatePlayerView(generics.CreateAPIView):
+    queryset = Player.objects.all()
+    serializer_class = PlayerSerializer
+
+class RetrievePlayerView(generics.RetrieveAPIView):
+    queryset = Player.objects.all()
+    serializer_class = PlayerSerializer
+    lookup_field = 'device_id'
