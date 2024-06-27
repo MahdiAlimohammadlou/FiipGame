@@ -14,3 +14,25 @@ class PlayerSerializer(serializers.ModelSerializer):
         fields = [
           "name", "profit", "coin", "level", "referral_code", "last_coin_update"
         ]
+
+class PlayerCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Player
+        fields = ['name', 'device_id']
+
+    def create(self, validated_data):
+        return Player.objects.create(**validated_data)
+
+class BusinessSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Business
+        fields = [
+          "id", "name", "base_profit", "cost", "upgrade_cost_factor", "category", "ranking"
+        ]
+
+class PlayerBusinessSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlayerBusiness
+        fields = [
+          "id", "player", "business", "level", "profit"
+        ]
