@@ -1,9 +1,10 @@
 # views.py
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework import status, generics
 from .models import Player, Business
-from .serializers import PlayerSerializer
+from .serializers import PlayerSerializer, PlayerCreateSerializer
 
 @api_view(['GET'])
 def top_players(request):
@@ -25,7 +26,7 @@ def top_players(request):
     
 class PlayerCreateView(APIView):
     def post(self, request, *args, **kwargs):
-        serializer = PlayerSerializer(data=request.data)
+        serializer = PlayerCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
