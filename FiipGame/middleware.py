@@ -1,9 +1,13 @@
-from channels.middleware import BaseMiddleware
-from channels.db import database_sync_to_async
-from django.contrib.auth.models import AnonymousUser
-from django.db import close_old_connections
-from account.models import Player
 import uuid
+
+from django.contrib.auth.models import AnonymousUser
+from django.core.exceptions import ValidationError
+from django.db import close_old_connections
+
+from channels.db import database_sync_to_async
+from channels.middleware import BaseMiddleware
+
+from account.models import Player
 
 @database_sync_to_async
 def get_user_from_api_key(api_key):
