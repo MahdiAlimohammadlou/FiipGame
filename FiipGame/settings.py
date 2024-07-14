@@ -34,6 +34,7 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     #Third-party apps
     'account',
     'rest_framework',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -74,8 +76,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'FiipGame.wsgi.application'
-
+# WSGI_APPLICATION = 'FiipGame.wsgi.application'
+ASGI_APPLICATION = 'FiipGame.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -167,5 +169,15 @@ CELERY_BEAT_SCHEDULE = {
     'update-coins-every-hour': {
         'task': 'account.tasks.update_player_coins',
         'schedule': crontab(minute=0, hour='*'),
+    },
+}
+
+#Channels
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        },
     },
 }

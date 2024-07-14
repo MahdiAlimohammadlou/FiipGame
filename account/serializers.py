@@ -8,6 +8,9 @@ class TopPlayerSerializer(serializers.ModelSerializer):
         fields = ["name", "profit", "coin", "level"]
 
 class PlayerSerializer(serializers.ModelSerializer):
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = Player
@@ -18,7 +21,7 @@ class PlayerSerializer(serializers.ModelSerializer):
 class PlayerCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
-        fields = ['name', 'device_id']
+        fields = ['name']
 
     def create(self, validated_data):
         return Player.objects.create(**validated_data)

@@ -3,8 +3,8 @@ from .models import Player, Business, PlayerBusiness
 
 # Player Admin
 class PlayerAdmin(admin.ModelAdmin):
-    list_display = ('name', 'device_id', 'profit', 'coin', 'level', 'referral_code', 'last_coin_update')
-    search_fields = ('name', 'device_id', 'referral_code')
+    list_display = ('name', 'profit', 'coin', 'level', 'referral_code', 'last_coin_update')
+    search_fields = ('name', 'referral_code')
     list_filter = ('level', 'last_coin_update')
     ordering = ('-last_coin_update', 'name')
 
