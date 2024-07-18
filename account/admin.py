@@ -3,10 +3,10 @@ from .models import Player, Business, PlayerBusiness
 
 # Player Admin
 class PlayerAdmin(admin.ModelAdmin):
-    list_display = ('name', 'profit', 'coin', 'level', 'referral_code', 'last_coin_update')
-    search_fields = ('name', 'referral_code')
+    list_display = ( 'profit', 'coin', 'level', 'referral_code', 'last_coin_update')
+    search_fields = ( 'referral_code',)
     list_filter = ('level', 'last_coin_update')
-    ordering = ('-last_coin_update', 'name')
+    ordering = ('-last_coin_update', )
 
 # Business Admin
 class BusinessAdmin(admin.ModelAdmin):
@@ -18,7 +18,7 @@ class BusinessAdmin(admin.ModelAdmin):
 # PlayerBusiness Admin
 class PlayerBusinessAdmin(admin.ModelAdmin):
     list_display = ('player', 'business', 'level', 'profit')
-    search_fields = ('player__name', 'business__name')
+    search_fields = ('business__name',)
     list_filter = ('business__category', 'level')
     ordering = ('-level', 'player')
 

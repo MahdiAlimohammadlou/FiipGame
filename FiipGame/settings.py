@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 load_dotenv(override=True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     #Third-party apps
     'account',
     'rest_framework',
+    'rest_framework_simplejwt',
     'channels'
 ]
 
@@ -90,6 +92,14 @@ DATABASES = {
         'PASSWORD': os.getenv("POSTGRES_PASSWORD"),
         'HOST': os.getenv("POSTGRES_HOST"),
         'PORT': os.getenv("POSTGRES_PORT"),
+    },
+    'main_service': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv("MAIN_POSTGRES_DB"),
+        'USER': os.getenv("MAIN_POSTGRES_USER"),
+        'PASSWORD': os.getenv("MAIN_POSTGRES_PASSWORD"),
+        'HOST': os.getenv("MAIN_POSTGRES_HOST"),
+        'PORT': os.getenv("MAIN_POSTGRES_PORT"),
     }
 }
 
@@ -143,9 +153,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #Rest framework
 #Rest framework
 REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': (
-        'core.renderers.CustomJSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'account.authentication.CustomJWTAuthentication',
     ),
     }
 
@@ -180,4 +189,15 @@ CHANNEL_LAYERS = {
             'hosts': [('127.0.0.1', 6379)],
         },
     },
+}
+
+#Simple JWT
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('JWT',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=5),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
 }

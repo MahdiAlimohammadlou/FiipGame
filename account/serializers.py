@@ -21,7 +21,7 @@ class PlayerSerializer(serializers.ModelSerializer):
 class PlayerCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
-        fields = ['name']
+        fields = ['avatar']
 
     def create(self, validated_data):
         return Player.objects.create(**validated_data)
