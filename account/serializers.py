@@ -1,24 +1,24 @@
 from rest_framework import serializers
+
+from core.serializers import BaseSerializer
+from core.utils import get_full_url
 from .models import Player, Business, PlayerBusiness
 
-class TopPlayerSerializer(serializers.ModelSerializer):
+class TopPlayerSerializer(BaseSerializer):
 
     class Meta:
         model = Player
-        fields = ["name", "profit", "coin", "level"]
+        fields = ["profit", "coin", "level"]
 
-class PlayerSerializer(serializers.ModelSerializer):
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class PlayerSerializer(BaseSerializer):
 
     class Meta:
         model = Player
         fields = [
-          "name", "profit", "coin", "level", "referral_code", "last_coin_update"
+        "user", "profit", "coin", "level", "referral_code", "last_coin_update", "avatar"
         ]
 
-class PlayerCreateSerializer(serializers.ModelSerializer):
+class PlayerCreateSerializer(BaseSerializer):
     class Meta:
         model = Player
         fields = ['avatar']
@@ -26,14 +26,20 @@ class PlayerCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return Player.objects.create(**validated_data)
 
-class BusinessSerializer(serializers.ModelSerializer):
+class BusinessSerializer(BaseSerializer):
+    image_abs_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Business
         fields = [
-          "id", "name", "base_profit", "cost", "upgrade_cost_factor", "category", "ranking"
+          "id", "name", "base_profit", "cost", "upgrade_cost_factor", "category", "ranking", "image_abs_url"
         ]
+    
+    def get_image_abs_url(self, obj):
+        return get_full_url(obj, 'business_image', self.url)
 
-class PlayerBusinessSerializer(serializers.ModelSerializer):
+
+class PlayerBusinessSerializer(BaseSerializer):
     class Meta:
         model = PlayerBusiness
         fields = [

@@ -54,9 +54,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Player(AbstractBaseModel):
     AVATAR_CHOICES = [
-        ('M', 'Male'),  
-        ('F', 'Female'),  
+        ('M', 'Male'),
+        ('F', 'Female'),
     ]
+    user = models.IntegerField(unique=True)
     profit = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     coin = models.IntegerField(default=0)
     level = models.IntegerField(default=1)
@@ -109,6 +110,7 @@ class Business(AbstractBaseModel):
     upgrade_cost_factor = models.DecimalField(max_digits=5, decimal_places=2, default=1.15)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     ranking = models.CharField(max_length=1, choices=RANKING_CHOICES)
+    business_image = models.ImageField(upload_to="Business_images/")
 
     def __str__(self):
         return f"{self.name} ({self.get_category_display()} - {self.ranking})"

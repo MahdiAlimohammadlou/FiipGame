@@ -1,18 +1,16 @@
-from channels.db import database_sync_to_async
 import json
+
+from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
+from django.shortcuts import get_object_or_404
+
 from .models import Business, PlayerBusiness
+from .serializers import Player, BusinessSerializer, PlayerBusinessSerializer
 
 class BusinessConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.player = self.scope.get('user', None)
-
-        if self.player is None or self.player.is_anonymous:
-            await self.accept()
-            await self.send_error("Invalid API key.")
-            await self.close()
-            return
-
+        user = self.scope.get('user', None)
+        self.player = await database_sync_to_async(Player.objects.get)(user=user.id)
         await self.accept()
         await self.list_businesses()
 
@@ -57,33 +55,13 @@ class BusinessConsumer(AsyncWebsocketConsumer):
         player_businesses_list = await database_sync_to_async(list)(player_businesses)
         all_businesses_list = await database_sync_to_async(list)(all_businesses)
 
-        purchased_businesses_data = [
-            {
-                'id': await database_sync_to_async(lambda pb: pb.business.id)(pb),
-                'name': await database_sync_to_async(lambda pb: pb.business.name)(pb),
-                'level': pb.level,
-                'profit': str(pb.profit),
-                'upgrade_cost': str(pb.upgrade_cost),
-                'category': pb.business.category,
-                'ranking': pb.business.ranking
-            }
-            for pb in player_businesses_list
-        ]
+        context = {'request': self.scope}
 
-        purchased_business_ids = [pb['id'] for pb in purchased_businesses_data]
+        purchased_businesses_data = PlayerBusinessSerializer(player_businesses_list, many=True, context=context).data
+        purchased_business_ids = [pb['business']['id'] for pb in purchased_businesses_data]
+        
         unpurchased_businesses = [b for b in all_businesses_list if b.id not in purchased_business_ids]
-
-        unpurchased_businesses_data = [
-            {
-                'id': b.id,
-                'name': b.name,
-                'cost': str(b.cost),
-                'base_profit': str(b.base_profit),
-                'category': b.category,
-                'ranking': b.ranking
-            }
-            for b in unpurchased_businesses
-        ]
+        unpurchased_businesses_data = BusinessSerializer(unpurchased_businesses, many=True, context=context).data
 
         await self.send(json.dumps({
             'action': 'list',

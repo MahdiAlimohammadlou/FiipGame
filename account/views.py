@@ -3,10 +3,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import status, generics
-from .models import Player, Business
+from rest_framework import status
+from .models import Player
 from .serializers import PlayerSerializer, PlayerCreateSerializer
-# from .permissions import IsAuthenticatedWithApiKey
 
 @api_view(['GET'])
 def top_players(request):
@@ -27,46 +26,16 @@ def top_players(request):
         return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 class PlayerView(APIView):
-    # permission_classes = [IsAuthenticatedWithApiKey]
+    permission_classes = [IsAuthenticated]
 
-    # def post(self, request, *args, **kwargs):
-    #     serializer = PlayerCreateSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         player = serializer.save()
-    #         response_data = serializer.data
-    #         response_data['api_key'] = player.api_key
-    #         return Response(response_data, status=status.HTTP_201_CREATED)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, *args, **kwargs):
+        serializer = PlayerCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            player = serializer.save(user = request.user.id)
+            return Response({"detail": "Player created successfully."}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request, *args, **kwargs):
-        player = request.player
+        player = Player.objects.get(user=request.user.id)
         serializer = PlayerSerializer(player)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-class BuyBusinessView(generics.GenericAPIView):
-    # permission_classes = [IsAuthenticatedWithApiKey]
-    serializer_class = PlayerSerializer
-
-    def post(self, request, *args, **kwargs):
-        player = request.player
-        business = Business.objects.get(id=request.data['business_id'])
-        if player.buy_business(business):
-            return Response({'detail': 'Business bought successfully'}, status=status.HTTP_200_OK)
-        return Response({'detail': 'Not enough coins'}, status=status.HTTP_400_BAD_REQUEST)
-
-class UpgradeBusinessView(generics.GenericAPIView):
-    # permission_classes = [IsAuthenticatedWithApiKey]
-    serializer_class = PlayerSerializer
-
-    def post(self, request, *args, **kwargs):
-        player = request.player
-        business_id = request.data['business_id']
-        if player.upgrade_business(business_id):
-            return Response({'detail': 'Business upgraded successfully'}, status=status.HTTP_200_OK)
-        return Response({'detail': 'Not enough coins or business not found'}, status=status.HTTP_400_BAD_REQUEST)
-    
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def test_jwt(request):
-    print("test : ", request.user.email)
-    return Response({"message": "User is authenticated", "email": request.user.email})
