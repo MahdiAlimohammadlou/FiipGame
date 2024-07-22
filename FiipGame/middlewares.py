@@ -24,13 +24,21 @@ class JWTAuthMiddleware(BaseMiddleware):
             try:
                 # Extract token from the 'JWT ' prefix
                 token = authorization_header.decode().split(' ')[1]
-                print("jmshgd", token)
                 # Decode and validate the token
                 decoded_token = jwt.decode(token, settings.SIMPLE_JWT['SIGNING_KEY'], algorithms=[settings.SIMPLE_JWT['ALGORITHM']])
                 user_id = decoded_token['user_id']
-                print("jmshgd", user_id)
                 scope['user'] = await get_user(user_id)
-            except (jwt.ExpiredSignatureError, jwt.DecodeError, jwt.InvalidTokenError, IndexError):
+            except jwt.ExpiredSignatureError:
+                # Token has expired
+                scope['user'] = AnonymousUser()
+            except jwt.DecodeError:
+                # Token decoding failed
+                scope['user'] = AnonymousUser()
+            except jwt.InvalidTokenError:
+                # Invalid token
+                scope['user'] = AnonymousUser()
+            except IndexError:
+                # Malformed token
                 scope['user'] = AnonymousUser()
         else:
             scope['user'] = AnonymousUser()

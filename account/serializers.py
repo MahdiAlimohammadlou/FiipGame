@@ -3,6 +3,7 @@ from rest_framework import serializers
 from core.serializers import BaseSerializer
 from core.utils import get_full_url
 from .models import Player, Business, PlayerBusiness
+from asgiref.sync import sync_to_async
 
 class TopPlayerSerializer(BaseSerializer):
 
@@ -38,10 +39,17 @@ class BusinessSerializer(BaseSerializer):
     def get_image_abs_url(self, obj):
         return get_full_url(obj, 'business_image', self.url)
 
+class PlayerBusinessSerializer(serializers.ModelSerializer):
+    business_detail = serializers.SerializerMethodField()
 
-class PlayerBusinessSerializer(BaseSerializer):
     class Meta:
         model = PlayerBusiness
         fields = [
-          "id", "player", "business", "level", "profit"
+            "id", "player", "level", "profit", "business", "business_detail"
         ]
+
+    def get_business_detail(self, obj):
+        queryset = Business.objects.filter(id=obj.business_id)
+        business = queryset.first()
+        serializer = BusinessSerializer(instance=business, context={"url": self.url})
+        return serializer.data
