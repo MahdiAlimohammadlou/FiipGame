@@ -37,9 +37,11 @@ class BusinessSerializer(BaseSerializer):
         ]
     
     def get_image_abs_url(self, obj):
-        return get_full_url(obj, 'business_image', self.url)
+        if obj.business_image:
+            return get_full_url(obj, 'business_image', self.url)
+        return None
 
-class PlayerBusinessSerializer(serializers.ModelSerializer):
+class PlayerBusinessSerializer(BaseSerializer):
     business_detail = serializers.SerializerMethodField()
 
     class Meta:

@@ -8,8 +8,9 @@ from .serializers import Player, BusinessSerializer, PlayerBusinessSerializer
 
 class BusinessConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        user = self.scope.get('user', None)
-        self.player = await sync_to_async(Player.objects.get)(user=user.id)
+        # user = self.scope.get('user', None)
+        # self.player = await sync_to_async(Player.objects.get)(user=user.id)
+        self.player = await sync_to_async(Player.objects.get)(id=8)
         await self.accept()
         await self.list_businesses()
 

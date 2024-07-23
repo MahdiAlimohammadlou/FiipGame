@@ -1,25 +1,13 @@
 from PIL import Image
-from django.db import models
+from os import getenv
 
-def get_current_url(input_data):
-    if isinstance(input_data, dict):
-        if 'scheme' in input_data and 'server' in input_data:
-            # Handling input_data as self.scope
-            scheme = input_data['scheme']
-            host, port = input_data['server']
-            return f"{scheme}://{host}"
-        elif 'type' in input_data and input_data['type'] == 'websocket':
-            # Handling input_data for websocket
-            scheme = 'ws'
-            host, port = input_data['server']
-            return f"{scheme}://{host}:{port}"
-        else:
-            raise ValueError("Invalid dictionary format for input_data")
-    elif hasattr(input_data, 'scheme') and hasattr(input_data, 'get_host'):
-        # Handling input_data as request
-        return input_data.scheme + "://" + input_data.get_host()
-    else:
-        raise ValueError("Invalid input_data provided to get_current_url")
+from django.db import models
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
+
+def get_current_url(request):
+    return getenv("URL")
 
 def get_full_url(obj, field_name, base_url):
     field = getattr(obj, field_name)
