@@ -12,8 +12,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_buyer = models.BooleanField(default=False)
     is_agent = models.BooleanField(default=False)
     is_guest = models.BooleanField(default=True)
-    otp_code = models.CharField(blank=True, max_length=6, null=True)
-    otp_created_at = models.DateTimeField(blank=True, null=True)
     is_phone_verified = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
@@ -110,7 +108,7 @@ class Business(AbstractBaseModel):
     upgrade_cost_factor = models.DecimalField(max_digits=5, decimal_places=2, default=1.15)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     ranking = models.CharField(max_length=1, choices=RANKING_CHOICES)
-    business_image = models.ImageField(upload_to="Business_images/", null=True, blank=True)
+    business_image = models.ImageField(upload_to="Account/Business_images/", null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} ({self.get_category_display()} - {self.ranking})"
