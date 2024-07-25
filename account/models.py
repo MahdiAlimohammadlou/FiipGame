@@ -1,8 +1,9 @@
 from django.db import models
-from core.models import AbstractBaseModel
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
 from datetime import timedelta
+from core.models import AbstractBaseModel
+from asset.models import Cryptocurrency, Property, Stock, Vehicle 
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
@@ -85,7 +86,117 @@ class Player(AbstractBaseModel):
     def upgrade_business(self, business_id):
         player_business = PlayerBusiness.objects.get(player=self, business_id=business_id)
         return player_business.upgrade()
+    
+    def buy_cryptocurrency(self, cryptocurrency, quantity):
+        total_cost = cryptocurrency.price * quantity
+        if self.coin >= total_cost and cryptocurrency.purchasable_quantity >= quantity:
+            player_crypto, created = PlayerCryptocurrency.objects.get_or_create(player=self, cryptocurrency=cryptocurrency)
+            if created:
+                player_crypto.quantity = quantity
+            else:
+                player_crypto.quantity += quantity
+            cryptocurrency.purchasable_quantity -= quantity
+            self.coin -= total_cost
+            self.save()
+            cryptocurrency.save()
+            player_crypto.save()
+            return True
+        return False
 
+    def sell_cryptocurrency(self, cryptocurrency, quantity):
+        try:
+            player_crypto = PlayerCryptocurrency.objects.get(player=self, cryptocurrency=cryptocurrency)
+            if player_crypto.quantity >= quantity:
+                player_crypto.quantity -= quantity
+                cryptocurrency.purchasable_quantity += quantity
+                self.coin += cryptocurrency.price * quantity
+                self.save()
+                cryptocurrency.save()
+                if player_crypto.quantity == 0:
+                    player_crypto.delete()
+                else:
+                    player_crypto.save()
+                return True
+        except PlayerCryptocurrency.DoesNotExist:
+            return False
+        return False
+
+    def buy_property(self, property):
+        if self.coin >= property.price:
+            player_property, created = PlayerProperty.objects.get_or_create(player=self, property=property)
+            if not created:
+                return False
+            self.coin -= property.price
+            self.save()
+            player_property.save()
+            return True
+        return False
+
+    def sell_property(self, property):
+        try:
+            player_property = PlayerProperty.objects.get(player=self, property=property)
+            self.coin += property.price
+            self.save()
+            player_property.delete()
+            return True
+        except PlayerProperty.DoesNotExist:
+            return False
+
+    def buy_stock(self, stock, quantity):
+        total_cost = stock.price * quantity
+        if self.coin >= total_cost and stock.purchasable_quantity >= quantity:
+            player_stock, created = PlayerStock.objects.get_or_create(player=self, stock=stock)
+            if created:
+                player_stock.quantity = quantity
+            else:
+                player_stock.quantity += quantity
+            stock.purchasable_quantity -= quantity
+            self.coin -= total_cost
+            self.save()
+            stock.save()
+            player_stock.save()
+            return True
+        return False
+
+    def sell_stock(self, stock, quantity):
+        try:
+            player_stock = PlayerStock.objects.get(player=self, stock=stock)
+            if player_stock.quantity >= quantity:
+                player_stock.quantity -= quantity
+                stock.purchasable_quantity += quantity
+                self.coin += stock.price * quantity
+                self.save()
+                stock.save()
+                if player_stock.quantity == 0:
+                    player_stock.delete()
+                else:
+                    player_stock.save()
+                return True
+        except PlayerStock.DoesNotExist:
+            return False
+        return False
+
+    def buy_vehicle(self, vehicle):
+        if self.coin >= vehicle.price:
+            player_vehicle, created = PlayerVehicle.objects.get_or_create(player=self, vehicle=vehicle)
+            if not created:
+                return False
+            self.coin -= vehicle.price
+            self.save()
+            player_vehicle.save()
+            return True
+        return False
+
+    def sell_vehicle(self, vehicle):
+        try:
+            player_vehicle = PlayerVehicle.objects.get(player=self, vehicle=vehicle)
+            self.coin += vehicle.price
+            self.save()
+            player_vehicle.delete()
+            return True
+        except PlayerVehicle.DoesNotExist:
+            return False
+        
 class Business(AbstractBaseModel):
     CATEGORY_CHOICES = [
         ('مغازه', 'مغازه'),
@@ -141,3 +252,22 @@ class PlayerBusiness(AbstractBaseModel):
 
     def __str__(self):
         return f"{self.player.name} - {self.business.name} (Level {self.level})"
+    
+
+class PlayerCryptocurrency(AbstractBaseModel):
+    player = models.ForeignKey('Player', on_delete=models.CASCADE)
+    cryptocurrency = models.ForeignKey(Cryptocurrency, on_delete=models.CASCADE)
+    quantity = models.DecimalField(max_digits=12, decimal_places=2)
+
+class PlayerProperty(AbstractBaseModel):
+    player = models.ForeignKey('Player', on_delete=models.CASCADE)
+    property = models.ForeignKey(Property, on_delete=models.CASCADE)
+
+class PlayerStock(AbstractBaseModel):
+    player = models.ForeignKey('Player', on_delete=models.CASCADE)
+    stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
+    quantity = models.DecimalField(max_digits=12, decimal_places=2)
+
+class PlayerVehicle(AbstractBaseModel):
+    player = models.ForeignKey('Player', on_delete=models.CASCADE)
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
