@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
 from datetime import timedelta
 from core.models import AbstractBaseModel
-from asset.models import Cryptocurrency, Property, Stock, Vehicle 
+from asset.models import Business, Cryptocurrency, Property, Stock, Vehicle 
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
@@ -196,33 +196,6 @@ class Player(AbstractBaseModel):
             return True
         except PlayerVehicle.DoesNotExist:
             return False
-        
-class Business(AbstractBaseModel):
-    CATEGORY_CHOICES = [
-        ('مغازه', 'مغازه'),
-        ('شرکت', 'شرکت'),
-        ('تولیدی', 'تولیدی'),
-        ('واردات', 'واردات'),
-        ('معدن', 'معدن'),
-        ('کارخانه', 'کارخانه'),
-    ]
-
-    RANKING_CHOICES = [
-        ('A', 'A'),
-        ('B', 'B'),
-        ('C', 'C'),
-    ]
-
-    name = models.CharField(max_length=100)
-    base_profit = models.DecimalField(max_digits=10, decimal_places=2)
-    cost = models.DecimalField(max_digits=10, decimal_places=2)
-    upgrade_cost_factor = models.DecimalField(max_digits=5, decimal_places=2, default=1.15)
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
-    ranking = models.CharField(max_length=1, choices=RANKING_CHOICES)
-    business_image = models.ImageField(upload_to="Account/Business_images/", null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.name} ({self.get_category_display()} - {self.ranking})"
 
 class PlayerBusiness(AbstractBaseModel):
     player = models.ForeignKey('Player', on_delete=models.CASCADE)
