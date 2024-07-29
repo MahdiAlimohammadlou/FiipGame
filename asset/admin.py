@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import Cryptocurrency, Property, Stock, Vehicle
+from .models import Business, Cryptocurrency, Property, Stock, Vehicle
+
+class BusinessAdmin(admin.ModelAdmin):
+    list_display = ('name', 'category', 'ranking', 'base_profit', 'cost', 'upgrade_cost_factor')
+    search_fields = ('name',)
+    list_filter = ('category', 'ranking')
+    ordering = ('name',)
 
 class CryptocurrencyAdmin(admin.ModelAdmin):
     list_display = ('name', 'price', 'purchasable_quantity', 'currency_logo')
@@ -25,6 +31,7 @@ class VehicleAdmin(admin.ModelAdmin):
     list_filter = ('vehicle_type', 'price')
     ordering = ('name',)
 
+admin.site.register(Business, BusinessAdmin)
 admin.site.register(Cryptocurrency, CryptocurrencyAdmin)
 admin.site.register(Property, PropertyAdmin)
 admin.site.register(Stock, StockAdmin)

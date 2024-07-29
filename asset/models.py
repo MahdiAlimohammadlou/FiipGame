@@ -28,9 +28,6 @@ class Business(AbstractBaseModel):
 
     def __str__(self):
         return f"{self.name} ({self.get_category_display()} - {self.ranking})"
-    
-    class Meta:
-        db_table = "account_business"
 
 class Cryptocurrency(AbstractBaseModel):
     name = models.CharField(max_length=225)
@@ -68,5 +65,5 @@ class Vehicle(AbstractBaseModel):
 
     name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=12, decimal_places=2)
-    vehicle_img = models.ImageField(upload_to="Asset/vehicle_images", null=True, blank=True)
     vehicle_type = models.CharField(max_length=255, choices=VEHICLE_TYPES)
+    vehicle_img = models.ImageField(upload_to="Asset/vehicle_images", null=True, blank=True)
