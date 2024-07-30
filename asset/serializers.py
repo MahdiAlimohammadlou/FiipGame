@@ -10,7 +10,7 @@ class BusinessSerializer(BaseSerializer):
     class Meta:
         model = Business
         fields = [
-          "id", "name", "base_profit", "cost", "upgrade_cost_factor", "category", "ranking", "image_abs_url"
+          "id", "name", "base_profit", "cost", "upgrade_cost_factor", "category", "ranking", "description", "image_abs_url"
         ]
     
     def get_image_abs_url(self, obj):

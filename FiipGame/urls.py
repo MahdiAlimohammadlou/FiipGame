@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('secret-FiipGame-admin/', admin.site.urls),
     path('v1/account/', include("account.urls")),
+    path('v1/asset/', include("asset.urls")),
 ]
 
 if settings.DEBUG :
