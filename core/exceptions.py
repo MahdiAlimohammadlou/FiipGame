@@ -7,3 +7,8 @@ class InvalidQuantity(Exception):
     def __init__(self, message="Invalid quantity for the transaction"):
         self.message = message
         super().__init__(self.message)
+
+class ItemDoesNotExist(Exception):
+    def __init__(self, message="Item does not exist"):
+        self.message = message
+        super().__init__(self.message)

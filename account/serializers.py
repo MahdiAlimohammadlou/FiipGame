@@ -2,10 +2,12 @@ from rest_framework import serializers
 
 from core.serializers import BaseSerializer
 from .models import (Player, PlayerBusiness, PlayerCryptocurrency, PlayerProperty,
-                      PlayerStock, PlayerVehicle)
+                      PlayerStock, PlayerVehicle, PlayerItem)
 from asset.models import Business, Cryptocurrency, Property, Stock, Vehicle
 from asset.serializers import (BusinessSerializer, CryptocurrencySerializer, PropertySerializer,
                                 StockSerializer, VehicleSerializer)
+from avatar_customization.models import Item
+from avatar_customization.serializers import ItemSerializer
 
 class TopPlayerSerializer(BaseSerializer):
 
@@ -97,4 +99,18 @@ class PlayerVehicleSerializer(BaseSerializer):
     def get_vehicle_detail(self, obj):
         queryset = Vehicle.objects.get(id=obj.vehicle.id)
         serializer = VehicleSerializer(instance=queryset, context={"url": self.url})
+        return serializer.data
+    
+class PlayerItemSerializer(BaseSerializer):
+    item_detail = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PlayerItem
+        fields = [
+                "id", "player", "item", "is_active", "item_detail"
+        ]
+
+    def get_item_detail(self, obj):
+        queryset = Item.objects.get(id=obj.item.id)
+        serializer = ItemSerializer(instance=queryset, context={"url": self.url})
         return serializer.data

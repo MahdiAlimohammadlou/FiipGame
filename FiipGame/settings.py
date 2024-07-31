@@ -44,11 +44,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #Third-party apps
-    'account',
     'rest_framework',
     'rest_framework_simplejwt',
+
     'channels',
+    'account',
     'asset',
+    'avatar_customization'
 ]
 
 MIDDLEWARE = [

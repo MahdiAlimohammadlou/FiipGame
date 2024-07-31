@@ -23,6 +23,7 @@ urlpatterns = [
     path('secret-FiipGame-admin/', admin.site.urls),
     path('v1/account/', include("account.urls")),
     path('v1/asset/', include("asset.urls")),
+    path('v1/avatar/', include("avatar_customization.urls")),
 ]
 
 if settings.DEBUG :

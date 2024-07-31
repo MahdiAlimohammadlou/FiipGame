@@ -4,7 +4,8 @@ from django.utils import timezone
 from datetime import timedelta
 from core.models import AbstractBaseModel
 from asset.models import Business, Cryptocurrency, Property, Stock, Vehicle 
-from .exceptions import NotEnoughMoney, InvalidQuantity
+from avatar_customization.models import Item
+from core.exceptions import NotEnoughMoney, InvalidQuantity
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
@@ -253,3 +254,11 @@ class PlayerStock(AbstractBaseModel):
 class PlayerVehicle(AbstractBaseModel):
     player = models.ForeignKey('Player', on_delete=models.CASCADE)
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
+
+class PlayerItem(AbstractBaseModel):
+    player = models.ForeignKey('Player', on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.player} - {self.item} - {'Active' if self.is_active else 'Inactive'}"
