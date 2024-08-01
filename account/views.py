@@ -80,5 +80,4 @@ def tap_count(request):
         player.coin += coin 
         player.save()
         return Response({'success': True})
-
     return Response({'error': 'Invalid method'}, status=405)

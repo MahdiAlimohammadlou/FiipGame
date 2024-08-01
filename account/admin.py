@@ -1,5 +1,12 @@
 from django.contrib import admin
-from .models import Player, PlayerBusiness
+from .models import Player, PlayerBusiness, Avatar
+
+# Player Admin
+class AvatarAdmin(admin.ModelAdmin):
+    list_display = ( 'name', 'gender')
+    search_fields = ( 'name',)
+    list_filter = ('gender',)
+    ordering = ('name', )
 
 # Player Admin
 class PlayerAdmin(admin.ModelAdmin):
@@ -18,3 +25,4 @@ class PlayerBusinessAdmin(admin.ModelAdmin):
 # Register your models here if not using @admin.register
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(PlayerBusiness, PlayerBusinessAdmin)
+admin.site.register(Avatar, AvatarAdmin)

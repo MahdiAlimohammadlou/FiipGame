@@ -53,16 +53,24 @@ class User(AbstractBaseUser, PermissionsMixin):
         db_table = 'account_user'
         managed = False
 
-class Player(AbstractBaseModel):
+class Avatar(AbstractBaseModel):
     AVATAR_CHOICES = [
         ('M', 'Male'),
         ('F', 'Female'),
     ]
+    name = models.CharField(max_length=255)
+    gender = models.CharField(max_length=255, choices=AVATAR_CHOICES)
+    avatar_image = models.ImageField(upload_to="Account/avatar_images/", null=True, blank=True)
+
+    def __str__(self) -> str:
+        return self.name
+
+class Player(AbstractBaseModel):
     user = models.IntegerField(unique=True)
     profit = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     coin = models.IntegerField(default=0)
     level = models.IntegerField(default=1)
-    avatar = models.CharField(max_length=5, choices=AVATAR_CHOICES, default="M")
+    avatar = models.ForeignKey(Avatar, on_delete=models.CASCADE)
     multitap = models.IntegerField(default=1)
     referral_code = models.CharField(max_length=20, unique=True, blank=True, null=True)
     last_coin_update = models.DateTimeField(default=timezone.now)
