@@ -1,14 +1,19 @@
+import time
+import hmac
+import hashlib
+import json
+
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from django.shortcuts import get_object_or_404
 
-from .models import Player, PlayerBusiness
-from .serializers import PlayerSerializer, PlayerCreateSerializer, PlayerBusinessSerializer
-from asset.models import Business
-from asset.serializers import BusinessSerializer
+from .models import Player
+from .serializers import PlayerSerializer, PlayerCreateSerializer
 
 @api_view(['GET'])
 def top_players(request):
@@ -42,3 +47,38 @@ class PlayerView(APIView):
         player = Player.objects.get(user=request.user.id)
         serializer = PlayerSerializer(player)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@csrf_exempt
+def tap_count(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        count = data.get('count')
+        timestamp = int(request.headers.get('X-Tap-Timestamp'))
+        signature = request.headers.get('X-Tap-Signature')
+
+        if not timestamp or not signature:
+            return Response({'error': 'Missing signature or timestamp'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate timestamp (e.g., within the last 60 seconds)
+        if abs(time.time() - timestamp) > 60:
+            return Response({'error': 'Invalid timestamp'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate signature
+        expected_signature = hmac.new(
+            settings.SECRET_KEY.encode(),
+            f'{count}{timestamp}'.encode(),
+            hashlib.sha256
+        ).hexdigest()
+
+        if not hmac.compare_digest(expected_signature, signature):
+            return Response({'error': 'Invalid signature'}, status=status.HTTP_400_BAD_REQUEST)
+
+        player = get_object_or_404(Player, user=request.user.id)
+        coin = player.multitap * count
+        player.coin += coin 
+        player.save()
+        return Response({'success': True})
+
+    return Response({'error': 'Invalid method'}, status=405)
