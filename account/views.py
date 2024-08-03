@@ -14,6 +14,9 @@ from rest_framework import status
 
 from .models import Player
 from .serializers import PlayerSerializer, PlayerCreateSerializer
+from .utils import (get_player_business_cost, get_player_crypto_cost,
+                    get_player_property_cost, get_player_item_cost, 
+                    get_player_stock_cost, get_player_vehicle_cost)
 
 @api_view(['GET'])
 def top_players(request):
@@ -81,3 +84,26 @@ def tap_count(request):
         player.save()
         return Response({'success': True})
     return Response({'error': 'Invalid method'}, status=405)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+@csrf_exempt
+def get_values(request):
+    if request.method == 'GET':
+        player = get_object_or_404(Player, user=request.user.id)
+        business_cost = get_player_business_cost(player)
+        crypto_cost = get_player_crypto_cost(player)
+        property_cost = get_player_property_cost(player)
+        stock_cost = get_player_stock_cost(player)
+        vehicle_cost = get_player_vehicle_cost(player)
+        item_cost = get_player_item_cost(player)
+
+        return Response({
+            "business_cost" : business_cost,
+            "crypto_cost" : crypto_cost,
+            "property_cost" : property_cost,
+            "stock_cost" : stock_cost,
+            "vehicle_cost" : vehicle_cost,
+            "item_cost" : item_cost
+        }, status=status.HTTP_200_OK)
+    return Response({'error': 'Invalid method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
